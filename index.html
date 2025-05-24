@@ -13,6 +13,7 @@
       text-align: center;
       padding: 5vw;
       transition: background-color 0.3s, color 0.3s;
+      font-size: 1rem;
     }
     @keyframes gradientBG {
       0% { background-position: 0% 50%; }
@@ -25,6 +26,8 @@
     }
     h1 {
       color: #4a90e2;
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
     header .logo img {
     height: 100px;
@@ -33,11 +36,12 @@
       .square-image{
       width: 15vw;  /* Adjust size as needed */
       height: 15vw; /* Make sure width and height are equal */
+      max-width: 100px;
+      max-height: 100px;
       border-radius: 10%; /* Makes the image circular */
       object-fit: cover; /* Ensures the image covers the area */
       display: block;
-      max-width: 100px;
-      max-height: 100px;
+      margin: 0 auto;
       }
     input, button, select {
       padding: 10px;
@@ -45,6 +49,8 @@
       margin: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
+      width: 80%;
+      max-width: 300px;
     }
     button {
       background-color: #4a90e2;
@@ -57,7 +63,7 @@
     }
     .message, .result, .guesses, .scoreboard, .timer, .playerTurn {
       margin-top: 20px;
-      font-size: 18px;
+      font-size: 1rem;
     }
     .animate-flash {
       animation: flash 0.6s;
@@ -89,29 +95,32 @@
     position: relative;
     }
     /* 4. Inputs & buttons on small screens */
-@media (max-width: 600px) {
-  input, button, select {
-    width: 90%;
-    font-size: 1rem;
-  }
+  @media (max-width: 600px) {
+    body {
+      padding: 5vw 3vw;
+    }
+    h1 {
+      font-size: 1.5rem;
+    }
+      
+    input, button, select {
+        width: 100%;
+      font-size: 1rem;
+    }
 
-  .square-image {
-    width: 20vw;
-    height: 20vw;
-  }
+    .square-image {
+      width: 20vw;
+      height: 20vw;
+      max-width: 80px;
+      max-height: 80px;
+    }
 
-  h1 {
-    font-size: 1.5rem;
-  }
 
-  .message, .result, .guesses, .scoreboard, .timer, .playerTurn {
-    font-size: 1rem;
-  }
+    .message, .result, .guesses, .scoreboard, .timer, .playerTurn {
+      font-size: 1rem;
+      }
 
-  body {
-    padding: 5vw 3vw;
-  }
-}
+    }
   </style>
 </head>
 <body>

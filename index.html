@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Letter Guessing Game</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(-45deg, #f4f4f4, #e0f7fa, #ffe0b2,#f6955e);
+      background-size: 400% 400%;
+      animation: gradientBG 10s ease infinite;
+      color: #333;
+      text-align: center;
+      padding: 50px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    body.dark {
+      background: linear-gradient(-45deg, #2c3e50, #34495e, #2c3e50);
+      color: #f0f0f0;
+    }
+    h1 {
+      color: #4a90e2;
+    }
+    input, button, select {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #4a90e2;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+    .message, .result, .guesses, .scoreboard, .timer, .playerTurn {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    .animate-flash {
+      animation: flash 0.6s;
+    }
+    @keyframes flash {
+      0% { background-color: #dff0d8; }
+      100% { background-color: transparent; }
+    }
+    .hint {
+      animation: fadeIn 0.8s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti-canvas"></canvas>
+  <h1>🎉 Letter Guessing Game 🎉</h1>
+  <p>🤖 I have a letter in mind (based on difficulty)</p>
+  <div>
+    <label>Difficulty:</label>
+    <select id="difficulty">
+      <option value="easy">Easy (A-Z)</option>
+      <option value="hard">Hard (A-Z + a-z)</option>
+    </select>
+    <label>Mode:</label>
+    <select id="mode">
+      <option value="single">Single Player</option>
+      <option value="multi">Multiplayer</option>
+    </select>
+    <button onclick="startGame()">Start Game 🚀</button>
+  </div>
+  <div class="playerTurn" id="playerTurn"></div>
+  <input type="text" id="guessInput" maxlength="1" placeholder="Enter a letter" disabled>
+  <button onclick="checkGuess()" id="submitBtn" disabled>Submit</button>
+  <button onclick="resetGame()">Restart 🔄</button>
+  <button onclick="toggleDarkMode()">Toggle Dark Mode 🌙</button>
+  <div class="message" id="message"></div>
+  <div class="result" id="result"></div>
+  <div class="guesses" id="guesses"></div>
+  <div class="scoreboard" id="scoreboard"></div>
+  <div class="timer" id="timer"></div>
+
+  <audio id="correctSound" src="https://assets.mixkit.co/sfx/download/mixkit-correct-answer-tone-2870.wav"></audio>
+  <audio id="wrongSound" src="https://assets.mixkit.co/sfx/download/mixkit-failure-arcade-alert-240.wav"></audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    const AtoZ = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+    let answer, attempts, guesses, bestScore, bestTime, timerInterval;
+    let startTime, isMultiplayer = false, currentPlayer = 1, players = [];
+
+    const guessInput = document.getElementById("guessInput");
+    const message = document.getElementById("message");
+    const result = document.getElementById("result");
+    const guessesDiv = document.getElementById("guesses");
+    const scoreboard = document.getElementById("scoreboard");
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
+    const timerDiv = document.getElementById("timer");
+    const playerTurnDiv = document.getElementById("playerTurn");
+
+    function startGame() {
+      const difficulty = document.getElementById("difficulty").value;
+      const mode = document.getElementById("mode").value;
+      isMultiplayer = mode === 'multi';
+      const letters = difficulty === 'easy' ? AtoZ : allLetters;
+
+      if (isMultiplayer) {
+        players = [
+          { name: "Player 1", guesses: [], attempts: 0, start: 0, end: 0 },
+          { name: "Player 2", guesses: [], attempts: 0, start: 0, end: 0 }
+        ];
+        currentPlayer = 0;
+      }
+
+      resetGame(letters);
+    }
+
+    function resetGame(letters = allLetters) {
+      answer = letters[Math.floor(Math.random() * letters.length)];
+      attempts = 0;
+      guesses = [];
+      message.textContent = "";
+      result.textContent = "";
+      guessesDiv.textContent = "";
+      guessInput.disabled = false;
+      guessInput.value = "";
+      guessInput.focus();
+      document.getElementById("submitBtn").disabled = false;
+      clearInterval(timerInterval);
+      startTime = Date.now();
+      timerInterval = setInterval(updateTimer, 1000);
+      updateTimer();
+      if (isMultiplayer) {
+        players[currentPlayer].start = Date.now();
+        playerTurnDiv.textContent = `${players[currentPlayer].name}'s turn 🧑‍🤝‍🧑`;
+      } else {
+        playerTurnDiv.textContent = "";
+      }
+    }
+
+    function updateTimer() {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      timerDiv.textContent = `⏱ Time: ${elapsed}s`;
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+    }
+
+    function triggerConfetti() {
+      confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+    }
+
+    function checkGuess() {
+      const guess = guessInput.value;
+      if (!guess || guess.length !== 1 || !allLetters.includes(guess)) {
+        message.textContent = "⚠️ Enter a valid letter (A-Z or a-z).";
+        return;
+      }
+
+      if (guesses.includes(guess)) {
+        message.textContent = `⛔ You already guessed '${guess}'!`;
+        return;
+      }
+
+      guesses.push(guess);
+      attempts++;
+      guessesDiv.textContent = `🔁 Guesses: ${guesses.join(", ")}`;
+
+      if (isMultiplayer) {
+        players[currentPlayer].guesses.push(guess);
+        players[currentPlayer].attempts++;
+      }
+
+      if (guess > answer) {
+        message.className = "message hint";
+        message.textContent = "⬇️ Too high!";
+        wrongSound.play();
+      } else if (guess < answer) {
+        message.className = "message hint";
+        message.textContent = "⬆️ Too low!";
+        wrongSound.play();
+      } else {
+        correctSound.play();
+        triggerConfetti();
+        guessInput.classList.add("animate-flash");
+        setTimeout(() => guessInput.classList.remove("animate-flash"), 600);
+
+        const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+
+        if (!isMultiplayer) {
+          if (!bestScore || attempts < bestScore) localStorage.setItem("bestScore", bestScore = attempts);
+          if (!bestTime || timeTaken < bestTime) localStorage.setItem("bestTime", bestTime = timeTaken);
+          result.textContent = `✅ Guessed in ${attempts} tries and ${timeTaken}s!`;
+        } else {
+          players[currentPlayer].end = Date.now();
+          if (currentPlayer === 0) {
+            currentPlayer = 1;
+            resetGame();
+            return;
+          } else {
+            const p1 = players[0], p2 = players[1];
+            const time1 = Math.floor((p1.end - p1.start) / 1000);
+            const time2 = Math.floor((p2.end - p2.start) / 1000);
+            const winner = (p1.attempts < p2.attempts) ? p1.name : (p2.attempts < p1.attempts) ? p2.name : (time1 < time2 ? p1.name : p2.name);
+            result.innerHTML = `🎉 ${winner} wins!<br>Player 1: ${p1.attempts} tries, ${time1}s<br>Player 2: ${p2.attempts} tries, ${time2}s`;
+            guessInput.disabled = true;
+            document.getElementById("submitBtn").disabled = true;
+            clearInterval(timerInterval);
+            return;
+          }
+        }
+
+        guessInput.disabled = true;
+        document.getElementById("submitBtn").disabled = true;
+        clearInterval(timerInterval);
+      }
+
+      guessInput.value = "";
+      guessInput.focus();
+    }
+  </script>
+</body>
+</html>

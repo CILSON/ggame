@@ -88,6 +88,30 @@
     padding: 20px;
     position: relative;
     }
+    /* 4. Inputs & buttons on small screens */
+@media (max-width: 600px) {
+  input, button, select {
+    width: 90%;
+    font-size: 1rem;
+  }
+
+  .square-image {
+    width: 20vw;
+    height: 20vw;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .message, .result, .guesses, .scoreboard, .timer, .playerTurn {
+    font-size: 1rem;
+  }
+
+  body {
+    padding: 5vw 3vw;
+  }
+}
   </style>
 </head>
 <body>

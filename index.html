@@ -101,10 +101,11 @@
 
   <audio id="correctSound" src="Sounds/correct-winner-sting-tomas-herudek-1-00-05.mp3"></audio>
   <audio id="wrongSound" src="Sounds/wrong-47985.mp3"></audio>
+  <audio id="clickSound" src="Sounds/button-click-289742.mp3"></audio>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
-    const AtoZ = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const AtoZ = 'A';
     const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
     let answer, attempts, guesses, bestScore, bestTime, timerInterval;
@@ -117,6 +118,7 @@
     const scoreboard = document.getElementById("scoreboard");
     const correctSound = document.getElementById("correctSound");
     const wrongSound = document.getElementById("wrongSound");
+    const clickSound = document.getElementById("clickSound");
     const timerDiv = document.getElementById("timer");
     const playerTurnDiv = document.getElementById("playerTurn");
 
@@ -135,6 +137,7 @@
       }
 
       resetGame(letters);
+
     }
 
     function resetGame(letters = allLetters) {
@@ -152,6 +155,7 @@
       startTime = Date.now();
       timerInterval = setInterval(updateTimer, 1000);
       updateTimer();
+      clickSound.play()
       if (isMultiplayer) {
         players[currentPlayer].start = Date.now();
         playerTurnDiv.textContent = `${players[currentPlayer].name}'s turn 🧑‍🤝‍🧑`;
@@ -167,6 +171,7 @@
 
     function toggleDarkMode() {
       document.body.classList.toggle("dark");
+      clickSound.play()
     }
 
     function triggerConfetti() {
@@ -204,6 +209,7 @@
         wrongSound.play();
       } else {
         correctSound.play();
+        correctSound.volume=0.7
         triggerConfetti();
         guessInput.classList.add("animate-flash");
         setTimeout(() => guessInput.classList.remove("animate-flash"), 600);
@@ -240,6 +246,7 @@
 
       guessInput.value = "";
       guessInput.focus();
+      clickSound.play()
     }
   </script>
 </body>

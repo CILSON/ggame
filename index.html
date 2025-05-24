@@ -26,6 +26,17 @@
     h1 {
       color: #4a90e2;
     }
+    header .logo img {
+    height: 100px;
+    width: auto;
+    }
+      .square-image{
+      width: 9%;  /* Adjust size as needed */
+      height: 9%; /* Make sure width and height are equal */
+      border-radius: 10%; /* Makes the image circular */
+      object-fit: cover; /* Ensures the image covers the area */
+      display: block;
+      }
     input, button, select {
       padding: 10px;
       font-size: 16px;
@@ -79,6 +90,11 @@
 </head>
 <body>
   <canvas id="confetti-canvas"></canvas>
+<header>
+  <a href="https://instagram.com/cilson_28" target="_blank">
+    <img src="Image/Screenshot 2025-02-26 084741.png" alt="CILSON" class="square-image">
+  </a>
+</header>
   <h1>🎉 Letter Guessing Game 🎉</h1>
   <p>🤖 I have a letter in mind (based on difficulty)</p>
   <div>
